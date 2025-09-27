@@ -161,18 +161,10 @@ RUN --mount=type=cache,id=ragflow_uv,target=/root/.cache/uv,sharing=locked \
         uv sync --python 3.10 --frozen --all-extras; \
     fi
 
-# first copy only package.json and package-lock.json to cache deps
-COPY web/package*.json web/
-RUN --mount=type=cache,id=ragflow_npm,target=/root/.npm,sharing=locked \
-    cd web && npm install
-
-# now copy the rest of the frontend source
 COPY web web
 COPY docs docs
-
-# this will always re-run if any file in web/* changes
-RUN cd web && npm run build
-
+RUN --mount=type=cache,id=ragflow_npm,target=/root/.npm,sharing=locked \
+    cd web && npm install && npm run build
 
 COPY .git /ragflow/.git
 
